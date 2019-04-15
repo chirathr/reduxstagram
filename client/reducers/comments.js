@@ -1,21 +1,29 @@
-export default function comments(state={}, action) {
+function postComments(state=[], action) {
     switch(action.type) {
         case 'ADD_COMMENT':
-            console.log(action);
-            const postCode = action.postCode;
-            const user = action.author;
-            const text = action.comment;
-            console.log(postCode, text, user);
-            return {
-                ...state,
-                [postCode]: [
-                    ...state[postCode], {
-                        text,
-                        user
-                    }
-                ]
-            };
+            return [
+                ...state, {
+                    user: action.author,
+                    text: action.comment
+                }
+            ];
+        case 'REMOVE_COMMENT':
+            return [
+                ...state.slice(0, action.i),
+                ...state.slice(action.i + 1)
+            ];
         default:
             return state;
     }
+}
+
+
+export default function comments(state={}, action) {
+    if (typeof action.postCode !== undefined) {
+        return {
+            ...state,
+            [action.postCode]: postComments(state[action.postCode], action)
+        };
+    }
+    return state;
 }
